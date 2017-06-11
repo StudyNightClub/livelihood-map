@@ -1,14 +1,15 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import requests
+from urllib.parse import urljoin
 import json
+import requests
 
 class MapPlotter:
     query_url =''
     hosting_url ='';
 
     def __init__(self, url, host):
-        self.query_url = url;
+        self.query_url = urljoin(url, '/events?ids=')
         self.hosting_url = host;
         print("drawMarker Init()")
 
