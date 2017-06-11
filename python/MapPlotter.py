@@ -61,7 +61,7 @@ class MapPlotter:
 		return result
 
 	#map.html?current_location=25.257738,121.473656&event_location=25.357738,121.573656;25.757738,121.673656;25.257738,121.173656&event_name=停水,停電,修路&event_time=2017-06-15:09:30:00~2017-06-16:16:00:00
-	def drawMarkerBySingleId(self,userIdLists,current_location):
+	def drawMarkerById(self,userIdLists,current_location):
 		url_result = self.hosting_url + "map.html?"
 		url_location = ""
 		event_location = ""
