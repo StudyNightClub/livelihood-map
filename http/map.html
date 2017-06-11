@@ -13,9 +13,14 @@
      html { height: 100% }
      body { height: 100%; margin: 0px; padding: 0px }
      #map { height: 100% }
+     #wrapper { position: relative; }
+     #over_map { position: absolute; top: 10px; left: 10px; z-index: 99; float:right;}
    </style>
 </head> 
 <body>
    <div id="map"></div>
+   <div id="over_map">
+     <label for="box"><input class="VisibileCheckbox" type="checkbox" checked="checked"></input>顯示商店</label>
+   </div>
 </body>
 </html>
