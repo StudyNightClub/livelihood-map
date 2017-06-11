@@ -5,8 +5,6 @@ import json
 import requests
 
 class MapPlotter:
-    query_url =''
-    hosting_url ='';
 
     def __init__(self, url, host):
         self.query_url = urljoin(url, '/events?ids=')
@@ -66,9 +64,9 @@ class MapPlotter:
         event_location = ""
         url_eventId = ','.join(eventIdLists)
         print("Request by " + str(url_eventId))
-        self.query_url += str(url_eventId)
-        print(self.query_url)
-        r = requests.get(url=self.query_url)
+        query = self.query_url + str(url_eventId)
+        print(query)
+        r = requests.get(url=query)
         decodeds = r.json()
         url_location = "current_location="+str(current_location['latitude'])+","+str(current_location['longitude'])+"&"
         url_event_location = self.produceEventLocationUrl(decodeds) + "&"
