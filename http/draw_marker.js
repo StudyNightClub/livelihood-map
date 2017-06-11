@@ -42,8 +42,6 @@ $(function() {
 		createMarker(myLatLng, label);
 		drawEvents();
         //console.log('Original lng : '+ lat +' lat :' + lng);
-
-        requestEGIS(lng,lat);
     }
 
     function requestEGIS(lon,lat){
@@ -92,13 +90,15 @@ $(function() {
         var count = Object.keys(response_result.features).length;
         console.log("json length" +count);
         for (var i =0; i<count ; i++) {
-            console.log(response_result.features[i].geometry.coordinates[0]);
-            console.log(response_result.features[i].geometry.coordinates[1]);
-            console.log(response_result.features[i].properties.Addr);
-            console.log(response_result.features[i].properties.BussName);
-            var coor_wgs_87 = twd97_to_latlng(response_result.features[i].geometry.coordinates[0],response_result.features[i].geometry.coordinates[1]);
-            var bussLatLng = new google.maps.LatLng(coor_wgs_87.lat,coor_wgs_87.lng);
-            markerGroup.push(createMarker(bussLatLng,"商家<br>" + response_result.features[i].properties.BussName + "<br>地址："+ response_result.features[i].properties.Addr));
+            //console.log(response_result.features[i].geometry.coordinates[0]);
+            //console.log(response_result.features[i].geometry.coordinates[1]);
+            //console.log(response_result.features[i].properties.Addr);
+            //console.log(response_result.features[i].properties.BussName);
+            if (i % 3 == 0){
+                var coor_wgs_87 = twd97_to_latlng(response_result.features[i].geometry.coordinates[0],response_result.features[i].geometry.coordinates[1]);
+                var bussLatLng = new google.maps.LatLng(coor_wgs_87.lat,coor_wgs_87.lng);
+                markerGroup.push(createMarker(bussLatLng,"商家<br>" + response_result.features[i].properties.BussName + "<br>地址："+ response_result.features[i].properties.Addr));
+            }
         }
     }
 
@@ -137,6 +137,7 @@ $(function() {
     		var label = eventName[i] + "<br>" + eventTime[i] + "<br>" + eventRoad[i];
     		var evtMarker = createMarker(evtLatLng, label);
             drawRangeRadius(evtLatLng,500,evtMarker);
+            requestEGIS(evtLocTmp[1],evtLocTmp[0]);
     	}
 
     	return null;

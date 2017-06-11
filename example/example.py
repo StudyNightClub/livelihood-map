@@ -1,7 +1,7 @@
 from mapplotter import MapPlotter
 
 #This is an example for generating a livelihood map url
-eventId_list = ['2b37b7a9-6e84-4524-9117-bde71a71c382','5a627f87-9f30-46f3-945f-9dd134513c39'];
+eventId_list = ['2b37b7a9-6e84-4524-9117-bde71a71c382','049c5182-4ab5-413a-82d7-67ca85e056c6','1d8ffd34-4506-41cb-aee9-ce7102b1ea9b'];
 # user current interest center point
 current_location = {'latitude':'25.0308547','longitude':'121.5084855'}; #latitude, longitude
 # api link and hosting link
