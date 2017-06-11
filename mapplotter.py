@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from urllib.parse import urljoin
-import json
 import requests
 
 class MapPlotter:
@@ -57,22 +56,21 @@ class MapPlotter:
         '''
         return result
 
+    def produceEventParameters(self, json):
+        return '&'.join([self.produceEventLocationUrl(json),
+                         self.produceEventNameUrl(json),
+                         self.produceEventTimeUrl(json),
+                         self.produceEventRoadUrl(json)])
+
     #map.html?current_location=25.257738,121.473656&event_location=25.357738,121.573656;25.757738,121.673656;25.257738,121.173656&event_name=停水,停電,修路&event_time=2017-06-15:09:30:00~2017-06-16:16:00:00
     def drawMarkerById(self,eventIdLists,current_location):
         url_result = self.hosting_url + "map.html?"
-        url_location = ""
-        event_location = ""
-        url_eventId = ','.join(eventIdLists)
-        print("Request by " + str(url_eventId))
-        query = self.query_url + str(url_eventId)
-        print(query)
-        r = requests.get(url=query)
-        decodeds = r.json()
-        url_location = "current_location="+str(current_location['latitude'])+","+str(current_location['longitude'])+"&"
-        url_event_location = self.produceEventLocationUrl(decodeds) + "&"
-        url_event_name = self.produceEventNameUrl(decodeds) + "&"
-        url_event_time = self.produceEventTimeUrl(decodeds) + "&"
-        url_event_road = self.produceEventRoadUrl(decodeds)
-        url_result = url_result+str(url_location)+str(url_event_location)+str(url_event_name)+str(url_event_time)+str(url_event_road)
-        #print(url_result)
+        url_result += "current_location="+str(current_location['latitude'])+","+str(current_location['longitude'])+"&"
+        if eventIdLists:
+            url_eventId = ','.join(eventIdLists)
+            query = self.query_url + str(url_eventId)
+            print(query)
+            r = requests.get(url=query)
+            decoded = r.json()
+            url_result += self.produceEventParameters(decoded)
         return url_result
