@@ -1,11 +1,11 @@
-from MapPlotter import MapPlotter
+from mapplotter import MapPlotter
 
 #This is an example for generating a livelihood map url
-userId_list = {'3d853b36-8d49-431a-a059-5ab59892cbe8','f7feb7fe-ce84-4473-8ccd-19ef99424799'};
+eventId_list = ['2b37b7a9-6e84-4524-9117-bde71a71c382','5a627f87-9f30-46f3-945f-9dd134513c39'];
 # user current interest center point
 current_location = {'latitude':'25.0308547','longitude':'121.5084855'}; #latitude, longitude
 # api link and hosting link
 x = MapPlotter('https://livelihood-api.herokuapp.com/events?ids=','http://www.3drens.tw/');
 #url will be produced by this function
-url = x.drawMarkerById(userId_list,current_location);
+url = x.drawMarkerById(eventId_list,current_location);
 print (url)
