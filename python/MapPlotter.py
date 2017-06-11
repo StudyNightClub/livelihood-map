@@ -77,4 +77,5 @@ class MapPlotter:
 		url_event_time = self.produceEventTimeUrl(decodeds) + "&"
 		url_event_road = self.produceEventRoadUrl(decodeds)
 		url_result = url_result+str(url_location)+str(url_event_location)+str(url_event_name)+str(url_event_time)+str(url_event_road)
-		print(url_result)
+		#print(url_result)
+		return url_result
