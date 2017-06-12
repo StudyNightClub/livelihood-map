@@ -88,13 +88,18 @@ $(function() {
     function drawAroundInfo(response_result){
         //alert(response_result);
         var count = Object.keys(response_result.features).length;
+        var mod = 1;
         console.log("json length" +count);
+
+        if (count > 30) {mod = 3;}
+        else if (count > 10 && count <= 30) {mod = 2};
+
         for (var i =0; i<count ; i++) {
             //console.log(response_result.features[i].geometry.coordinates[0]);
             //console.log(response_result.features[i].geometry.coordinates[1]);
             //console.log(response_result.features[i].properties.Addr);
             //console.log(response_result.features[i].properties.BussName);
-            if (i % 3 == 0){
+            if (i % mod == 0){
                 var coor_wgs_87 = twd97_to_latlng(response_result.features[i].geometry.coordinates[0],response_result.features[i].geometry.coordinates[1]);
                 var bussLatLng = new google.maps.LatLng(coor_wgs_87.lat,coor_wgs_87.lng);
                 markerGroup.push(createMarker(bussLatLng,"商家<br>" + response_result.features[i].properties.BussName + "<br>地址："+ response_result.features[i].properties.Addr));
@@ -191,15 +196,16 @@ $(function() {
             label = label.replace("water","停水公告")
         }
         else if (event_label[0].localeCompare("power") == false) {    
-            color = 'yellow'; 
+            color = 'orange';
             label = label.replace("power","停電公告")
         }
         else if (event_label[0].localeCompare("road") == false) {
-            color = 'purple';
-            label = label.replace("road","修路公告")
+            color = 'yellow';
+            label = label.replace("road","道路施工")
         }
         else if (event_label[0].localeCompare("商家") == false) {
-            color = 'orange';
+            label = label.replace("商家","受影響商家資訊")
+            color = 'purple';
         }
         else
             color = 'red';
