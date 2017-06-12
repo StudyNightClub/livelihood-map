@@ -20,17 +20,29 @@ class MapPlotter:
 
     def produceEventTimeUrl(self,decodeds_json):
         result = "event_time="
+        duration_time =""
         for index,decode in enumerate(decodeds_json):
             if (decode["start_date"] == None):
                 decode["start_date"] = "-"
-            if (decode["start_time"] == None):
-                decode["start_time"] = "-"
             if (decode["end_date"] == None):
                 decode["end_date"] = "-"
+            if (decode["start_time"] == None):
+                if(decode['type'] == "road"):
+                    decode["start_time"] = "依交通管制時間施工"
+                else:
+                    decode["start_time"] = "00:00:00"
             if (decode["end_time"] == None):
-                decode["end_time"] = "-"
+                if(decode['type'] == "road"):
+                    decode["end_time"] = "依交通管制時間施工"
+                else:
+                    decode["end_time"] = "23:59:00"
 
-            result += decode["start_date"] + ":" + decode["start_time"] + "~" + decode["end_date"] + ":" + decode["end_time"]
+            if decode["start_time"] == "依交通管制時間施工" and decode["end_time"] == "依交通管制時間施工":
+                duration_time = "依交通管制時間施工"
+            else:
+                duration_time = decode["start_time"] + "~" + decode["end_time"]
+
+            result += decode["start_date"] + "~" + decode["end_date"] + "<br>" + duration_time
             if (index != (len(decodeds_json)-1)):
                 result += ","
         return result
