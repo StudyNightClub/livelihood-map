@@ -189,6 +189,7 @@ $(function() {
 
 	function createMarker(latlng, label) {
         var event_label = label.split("<br>");
+        var marker_visible = true;
         //console.log(event_label[0]);
         if (event_label[0].localeCompare("water") == false)
         {
@@ -206,6 +207,7 @@ $(function() {
         else if (event_label[0].localeCompare("商家") == false) {
             label = label.replace("商家","受影響商家資訊")
             color = 'purple';
+            marker_visible = false;
         }
         else
             color = 'red';
@@ -216,6 +218,7 @@ $(function() {
         	position: latlng,
         	map: map,
         	title: label,
+            visible: marker_visible,
             icon: 'http://maps.google.com/mapfiles/ms/icons/'+color+'-dot.png',
         	zIndex: Math.round(latlng.lat()*-100000)<<5
         });
