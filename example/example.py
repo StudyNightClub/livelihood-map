@@ -5,7 +5,7 @@ eventId_list = ['2b37b7a9-6e84-4524-9117-bde71a71c382','049c5182-4ab5-413a-82d7-
 # user current interest center point
 current_location = {'latitude':'25.0308547','longitude':'121.5084855'}; #latitude, longitude
 # api link and hosting link
-x = MapPlotter('https://livelihood-api.herokuapp.com/events?ids=','http://www.3drens.tw/');
+x = MapPlotter('https://livelihood-api.herokuapp.com/events?ids=','http://tingshengchu.myds.me:9999/');
 # url will be produced by this function
 url = x.drawMarkerById(eventId_list,current_location);
 print(url)
