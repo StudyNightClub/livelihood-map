@@ -42,9 +42,9 @@ $(function() {
    		});
 
 		//create current location as marker
-		createMarker(myLatLng, label);
-		drawEvents();
         //console.log('Original lng : '+ lat +' lat :' + lng);
+		createMarker(myLatLng, label);
+        requestEventInfo();
     }
 
     function requestEGIS(lon,lat){
@@ -60,7 +60,6 @@ $(function() {
             method: 'GET',
             url: urlField
         }, function printResult(result) {
-            //outputField.value = result;
             jsonResult = JSON.parse(result);
             drawAroundInfo(jsonResult);
             //console.log(result);
@@ -77,10 +76,6 @@ $(function() {
         x.open(options.method, cors_api_url + options.url);
         x.onload = x.onerror = function() {
             printResult(x.responseText);
-            /*console.log( options.method + ' ' + options.url + '\n' +
-                x.status + ' ' + x.statusText + '\n\n' +
-                (x.responseText || '')
-            );*/
         };
         if (/^POST/i.test(options.method)) {
             x.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
@@ -89,7 +84,6 @@ $(function() {
     }
 
     function drawAroundInfo(response_result){
-        //alert(response_result);
         var count = Object.keys(response_result.features).length;
         var mod = 1;
         console.log("json length" +count);
@@ -107,6 +101,24 @@ $(function() {
                 var bussLatLng = new google.maps.LatLng(coor_wgs_87.lat,coor_wgs_87.lng);
                 markerGroup.push(createMarker(bussLatLng,"商家<br>" + response_result.features[i].properties.BussName + "<br>"+ response_result.features[i].properties.Addr));
             }
+        }
+    }
+
+    function drawEventsByJson(response_result){
+        var count = Object.keys(response_result).length;
+        var mod = 1;
+        //console.log("json length" +count);
+
+        for (var i =0; i<count ; i++) {
+            var eventLatLng = new google.maps.LatLng(response_result[i].affected_areas[0].coordinates[0].wgs84_latitude,response_result[i].affected_areas[0].coordinates[1].wgs84_longitude);
+            var start_date = response_result[i].start_date;
+            var end_date = response_result[i].end_date;
+            var start_time = response_result[i].start_time.substr(0,response_result[i].start_time.length - 3);
+            var end_time = response_result[i].end_time.substr(0,response_result[i].end_time.length - 3);
+            var eventType = response_result[i].type;
+            requestEGIS(response_result[i].affected_areas[0].coordinates[1].wgs84_longitude,response_result[i].affected_areas[0].coordinates[0].wgs84_latitude);
+            var evtMarker = createMarker(eventLatLng, eventType + "<br>" + start_date + "~" + end_date+ "<br>"+ start_time + "~" + end_time);
+            drawRangeRadius(eventLatLng,350,evtMarker);
         }
     }
 
@@ -130,28 +142,25 @@ $(function() {
     });
     }*/
 
-	function drawEvents() {
-		var event = [];
-		event[0] = [];
-		event[0][0] = [];
+    function getUrlEvents() {
+        var eventId = GetGetParameter("events").split(",");
+        /* for (var i = 0; i<eventId.length; i++) {
+            console.log("id : "+eventId[i]);
+        }*/
+        return eventId;
+    }
 
-    	var eventLocation = GetGetParameter("event_location").split(";");
-    	var eventName = GetGetParameter("event_name").split(",");
-        var eventTime = GetGetParameter("event_time").split(",");
-        var eventRoad = GetGetParameter("event_road").split(",");
-    	for (var i = 0; i<eventLocation.length; i++) {
-    		var evtLocTmp = eventLocation[i].split(",");
-    		var evtLatLng = new google.maps.LatLng(evtLocTmp[0],evtLocTmp[1]);
-    		var label = eventName[i] + "<br>" + eventTime[i] + "<br>" + eventRoad[i];
-    		var evtMarker = createMarker(evtLatLng, label);
-            drawRangeRadius(evtLatLng,350,evtMarker);
-            requestEGIS(evtLocTmp[1],evtLocTmp[0]);
-            
-            evtMarkerCluster.push(evtMarker);
-    	}
-
-    	return null;
-	}
+    function requestEventInfo(){
+        var urlField = 'https://livelihood-api.herokuapp.com/events?ids='+GetGetParameter("events");
+        doCORSRequest({
+            method: 'GET',
+            url: urlField
+        }, function printResult(result) {
+            console.log(result);
+            jsonResult = JSON.parse(result);
+            drawEventsByJson(jsonResult);
+        });
+    }
 
     //radius = meter, e.g. 1000meter
     function drawRangeRadius(latlng, radius, bindMarker) {
