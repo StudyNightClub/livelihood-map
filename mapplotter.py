@@ -11,8 +11,8 @@ class MapPlotter:
     def generateMapUrl(self, eventIdList, current_location):
         url_result = urljoin(self.hosting_url, 'map.html')
         query = {}
-        query['current_location'] = ','.join([current_location['latitude'],
-                                              current_location['longitude']])
+        query['current_location'] = ','.join([str(current_location['latitude']),
+                                              str(current_location['longitude'])])
         if eventIdList:
             query['events'] = ','.join(eventIdList)
 
