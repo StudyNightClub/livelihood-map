@@ -4,7 +4,7 @@
 *
 *  Specific livelihood event locations as marker on google map through "GET" parameter.
 *
-*  Version: 1.1.1
+*  Version: 1.1.2
 *  Latest update: Jun 20, 2017
 *
 *
@@ -114,17 +114,34 @@ $(function() {
         //console.log("json length" +count);
 
         for (var i =0; i<count ; i++) {
-            var eventLatLng = new google.maps.LatLng(response_result[i].affected_areas[0].coordinates[0].wgs84_latitude,response_result[i].affected_areas[0].coordinates[1].wgs84_longitude);
+            var eventLatLng = new google.maps.LatLng(response_result[i].affected_areas[0].coordinates[0].wgs84_latitude,response_result[i].affected_areas[0].coordinates[0].wgs84_longitude);
             var start_date = response_result[i].start_date;
             var end_date = response_result[i].end_date;
-            var start_time = response_result[i].start_time.substr(0,response_result[i].start_time.length - 3);
-            var end_time = response_result[i].end_time.substr(0,response_result[i].end_time.length - 3);
+            var start_time = response_result[i].start_time;
+            var end_time = response_result[i].end_time;
+            var time = concatTime(start_time,end_time);
             var eventType = response_result[i].type;
-            requestEGIS(response_result[i].affected_areas[0].coordinates[1].wgs84_longitude,response_result[i].affected_areas[0].coordinates[0].wgs84_latitude);
-            var evtMarker = createMarker(eventLatLng, eventType + "<br>" + start_date + "~" + end_date+ "<br>"+ start_time + "~" + end_time);
+            var city = response_result[i].city;
+            var district = response_result[i].district;
+            var road = response_result[i].road;
+
+            requestEGIS(response_result[i].affected_areas[0].coordinates[0].wgs84_longitude,response_result[i].affected_areas[0].coordinates[0].wgs84_latitude);
+            var evtMarker = createMarker(eventLatLng, eventType + "<br>" + start_date + " ~ " + end_date + "<br>" + time  + "<br>" + city + district + road);
             evtMarkerGroup.push(evtMarker);
             drawRangeRadius(eventLatLng,350,evtMarker);
         }
+    }
+
+    function concatTime(startTime, endTime){
+        if (startTime == null && endTime ==null)
+            return "依交通管制時間施工";
+        else if (startTime == null)
+            return "依交通管制時間施工 ~ "+ endTime.substr(0,endTime.length - 3);
+        else if (endTime == null)
+            return startTime.substr(0,startTime.length - 3) + " ~ 依交通管制時間施工";
+        else
+            return startTime.substr(0,startTime.length - 3) + " ~ "+ endTime.substr(0,endTime.length - 3);
+
     }
 
     function setMarkerGroupVisible(visible) {
