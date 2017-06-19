@@ -10,7 +10,4 @@ setup(name='mapplotter',
       author_email='',
       license='MIT',
       py_modules=['mapplotter'],
-      install_requires=[
-          'requests==2.17.3',
-      ],
      )
