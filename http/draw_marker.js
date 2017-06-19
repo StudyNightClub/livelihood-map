@@ -4,8 +4,8 @@
 *
 *  Specific livelihood event locations as marker on google map through "GET" parameter.
 *
-*  Version: 0.1
-*  Latest update: Jun 11, 2017
+*  Version: 1.1.0
+*  Latest update: Jun 19, 2017
 *
 *
 * ---------------------------------------------------------------------------- */
@@ -17,6 +17,9 @@ $(function() {
 	var infowindow = new google.maps.InfoWindow();
     var x97,y97;
     var markerGroup = [];
+    
+    var evtMarkerCluster = [];
+    var markerCluster;
 
 	function initialize() {
 
@@ -29,7 +32,7 @@ $(function() {
 		}
 
 		var myLatLng = new google.maps.LatLng(lat,lng);
-		var label = "感興趣的位置";
+		var label = "你感興趣的位置";
 
    		map = new google.maps.Map(document.getElementById('map'), { 
             //mapTypeId: google.maps.MapTypeId.TERRAIN,
@@ -102,7 +105,7 @@ $(function() {
             if (i % mod == 0){
                 var coor_wgs_87 = twd97_to_latlng(response_result.features[i].geometry.coordinates[0],response_result.features[i].geometry.coordinates[1]);
                 var bussLatLng = new google.maps.LatLng(coor_wgs_87.lat,coor_wgs_87.lng);
-                markerGroup.push(createMarker(bussLatLng,"商家<br>" + response_result.features[i].properties.BussName + "<br>地址："+ response_result.features[i].properties.Addr));
+                markerGroup.push(createMarker(bussLatLng,"商家<br>" + response_result.features[i].properties.BussName + "<br>"+ response_result.features[i].properties.Addr));
             }
         }
     }
@@ -141,8 +144,10 @@ $(function() {
     		var evtLatLng = new google.maps.LatLng(evtLocTmp[0],evtLocTmp[1]);
     		var label = eventName[i] + "<br>" + eventTime[i] + "<br>" + eventRoad[i];
     		var evtMarker = createMarker(evtLatLng, label);
-            drawRangeRadius(evtLatLng,500,evtMarker);
+            drawRangeRadius(evtLatLng,350,evtMarker);
             requestEGIS(evtLocTmp[1],evtLocTmp[0]);
+            
+            evtMarkerCluster.push(evtMarker);
     	}
 
     	return null;
@@ -152,11 +157,11 @@ $(function() {
     function drawRangeRadius(latlng, radius, bindMarker) {
 
         var circle = {
-            strokeColor: "#c3fc49",
-            strokeOpacity: 0.8,
-            strokeWeight: 2,
-            fillColor: "#c3fc49",
-            fillOpacity: 0.35,
+            strokeColor: "#8E8E8E",
+            strokeOpacity: 0.6,
+            strokeWeight: 1.2,
+            fillColor: "#8E8E8E",
+            fillOpacity: 0.3,
             map: map,
             center: latlng,
             radius: radius // in meters
@@ -193,24 +198,24 @@ $(function() {
         //console.log(event_label[0]);
         if (event_label[0].localeCompare("water") == false)
         {
-            color = 'blue';
-            label = label.replace("water","停水公告")
+            color = 'blue-dot';
+            label = label.replace("water","停水通知")
         }
         else if (event_label[0].localeCompare("power") == false) {    
-            color = 'orange';
-            label = label.replace("power","停電公告")
+            color = 'green-dot';
+            label = label.replace("power","停電通知")
         }
         else if (event_label[0].localeCompare("road") == false) {
-            color = 'yellow';
-            label = label.replace("road","道路施工")
+            color = 'orange-dot';
+            label = label.replace("road","道路施工通知")
         }
         else if (event_label[0].localeCompare("商家") == false) {
-            label = label.replace("商家","受影響商家資訊")
-            color = 'purple';
+            label = label.replace("商家","本地商家")
+            color = 'rangerstation';
             marker_visible = false;
         }
         else
-            color = 'red';
+            color = 'red-dot';
 
         var contentString = '<b>'+label+'</b>';
 
@@ -219,7 +224,7 @@ $(function() {
         	map: map,
         	title: label,
             visible: marker_visible,
-            icon: 'http://maps.google.com/mapfiles/ms/icons/'+color+'-dot.png',
+            icon: 'http://maps.google.com/mapfiles/ms/icons/'+color+'.png',
         	zIndex: Math.round(latlng.lat()*-100000)<<5
         });
         
@@ -313,15 +318,40 @@ $(function() {
         lng: $lng
       };
     }
+    
+    function setMarkerClusterVisible(visible) {
+        for (var i =0; i<evtMarkerCluster.length; i++)
+                evtMarkerCluster[i].setVisible(visible);
+    }
+    
+    function displayMarkerCluster() {
+        // Display marker cluster of stores              
+        markerCluster = new MarkerClusterer(map, markerGroup, {imagePath: './marker_clusterer/images/m'});
+        
+        markerCluster.setMinClusterSize(5);
+    }
+    
+    function hideMarkerCluster() {
+        markerCluster.clearMarkers();
+    }
+    
 	// Initialize map on window load
-	google.maps.event.addDomListener(window, 'load', initialize);
+    initialize();
+	// google.maps.event.addDomListener(window, 'load', initialize);
 
     //set checkbox for marker group visible / invisible
     $('.VisibileCheckbox').change(function() {
         if (this.checked) {
              setMarkerGroupVisible(true);
+             
+             setMarkerClusterVisible(false);
+             displayMarkerCluster();
+             
         } else {
             setMarkerGroupVisible(false);
+            
+            setMarkerClusterVisible(true);
+            hideMarkerCluster();
         }
     });
 
