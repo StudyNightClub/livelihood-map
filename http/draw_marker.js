@@ -4,8 +4,8 @@
 *
 *  Specific livelihood event locations as marker on google map through "GET" parameter.
 *
-*  Version: 1.1.0
-*  Latest update: Jun 19, 2017
+*  Version: 1.1.1
+*  Latest update: Jun 20, 2017
 *
 *
 * ---------------------------------------------------------------------------- */
@@ -141,14 +141,6 @@ $(function() {
       }
     });
     }*/
-
-    function getUrlEvents() {
-        var eventId = GetGetParameter("events").split(",");
-        /* for (var i = 0; i<eventId.length; i++) {
-            console.log("id : "+eventId[i]);
-        }*/
-        return eventId;
-    }
 
     function requestEventInfo(){
         var urlField = 'https://livelihood-api.herokuapp.com/events?ids='+GetGetParameter("events");
