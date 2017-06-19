@@ -18,7 +18,7 @@ $(function() {
     var x97,y97;
     var markerGroup = [];
     
-    var evtMarkerCluster = [];
+    var evtMarkerGroup = [];
     var markerCluster;
 
 	function initialize() {
@@ -30,6 +30,8 @@ $(function() {
 			alert ('Current location error');
 			return;
 		}
+
+        $('.VisibileCheckbox').hide();
 
 		var myLatLng = new google.maps.LatLng(lat,lng);
 		var label = "你感興趣的位置";
@@ -45,6 +47,7 @@ $(function() {
         //console.log('Original lng : '+ lat +' lat :' + lng);
 		createMarker(myLatLng, label);
         requestEventInfo();
+
     }
 
     function requestEGIS(lon,lat){
@@ -62,6 +65,7 @@ $(function() {
         }, function printResult(result) {
             jsonResult = JSON.parse(result);
             drawAroundInfo(jsonResult);
+            $('.VisibileCheckbox').show();
             //console.log(result);
         });
 
@@ -118,13 +122,17 @@ $(function() {
             var eventType = response_result[i].type;
             requestEGIS(response_result[i].affected_areas[0].coordinates[1].wgs84_longitude,response_result[i].affected_areas[0].coordinates[0].wgs84_latitude);
             var evtMarker = createMarker(eventLatLng, eventType + "<br>" + start_date + "~" + end_date+ "<br>"+ start_time + "~" + end_time);
+            evtMarkerGroup.push(evtMarker);
             drawRangeRadius(eventLatLng,350,evtMarker);
         }
     }
 
     function setMarkerGroupVisible(visible) {
         for (var i =0; i<markerGroup.length; i++)
-                markerGroup[i].setVisible(visible);
+            markerGroup[i].setVisible(visible);
+
+        for (var i =0; i<evtMarkerGroup.length; i++)
+            evtMarkerGroup[i].setVisible(!visible);
     }
 
     //Prepare code incase non coordinate data
@@ -169,7 +177,7 @@ $(function() {
         };
 
         cityCircle = new google.maps.Circle(circle);
-        cityCircle.bindTo('center', bindMarker, 'position');
+        //cityCircle.bindTo('center', bindMarker, 'position');
     }
 
 	function getCurrentLocation(latlng_type) {
@@ -344,14 +352,10 @@ $(function() {
     $('.VisibileCheckbox').change(function() {
         if (this.checked) {
              setMarkerGroupVisible(true);
-             
-             setMarkerClusterVisible(false);
              displayMarkerCluster();
              
         } else {
             setMarkerGroupVisible(false);
-            
-            setMarkerClusterVisible(true);
             hideMarkerCluster();
         }
     });
