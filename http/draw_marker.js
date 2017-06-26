@@ -4,50 +4,47 @@
 *
 *  Specific livelihood event locations as marker on google map through "GET" parameter.
 *
-*  Version: 1.1.2
-*  Latest update: Jun 20, 2017
+*  Version: 1.1.3
+*  Latest update: Jun 27, 2017
 *
 *
 * ---------------------------------------------------------------------------- */
 
 $(function() {
 
-	// Setup map
-	var map = null;
-	var infowindow = new google.maps.InfoWindow();
+    // Setup map
+    var map = null;
+    var infowindow = new google.maps.InfoWindow();
     var x97,y97;
     var markerGroup = [];
     
     var evtMarkerGroup = [];
     var markerCluster;
 
-	function initialize() {
-
-		var lat = getCurrentLocation('lat');
-		var lng = getCurrentLocation('lng');
-
-		if (lat == null && lng == null) {
-			alert ('Current location error');
-			return;
-		}
+    function initialize() {
+        var lat = getCurrentLocation('lat');
+        var lng = getCurrentLocation('lng');
+        if (lat == null && lng == null) {
+            alert ('Current location error');
+            return;
+        }
 
         $('.VisibileCheckbox').hide();
 
-		var myLatLng = new google.maps.LatLng(lat,lng);
-		var label = "你感興趣的位置";
+        var myLatLng = new google.maps.LatLng(lat,lng);
+        var label = "你感興趣的位置";
 
-   		map = new google.maps.Map(document.getElementById('map'), { 
+        map = new google.maps.Map(document.getElementById('map'), { 
             //mapTypeId: google.maps.MapTypeId.TERRAIN,
             zoom: 16,
             disableDefaultUI: true,
-   		    center: new google.maps.LatLng(lat,lng,3)
-   		});
+            center: new google.maps.LatLng(lat,lng,3)
+        });
 
-		//create current location as marker
+        //create current location as marker
         //console.log('Original lng : '+ lat +' lat :' + lng);
-		createMarker(myLatLng, label);
+        createMarker(myLatLng, label);
         requestEventInfo();
-
     }
 
     function requestEGIS(lon,lat){
@@ -168,7 +165,8 @@ $(function() {
     }*/
 
     function requestEventInfo(){
-        var urlField = 'https://livelihood-api.herokuapp.com/events?ids='+GetGetParameter("events");
+        var urlField = 'https://livelihood-api.herokuapp.com/events?before='+GetGetParameter('before')+'&after='+GetGetParameter('after')+'&type='+GetGetParameter('type');
+        console.log(urlField);
         doCORSRequest({
             method: 'GET',
             url: urlField
@@ -197,28 +195,26 @@ $(function() {
         //cityCircle.bindTo('center', bindMarker, 'position');
     }
 
-	function getCurrentLocation(latlng_type) {
-    	var latlng = GetGetParameter("current_location").split(",");
-    	if (latlng_type == 'lat')
-    		return latlng[0];
-    	else if (latlng_type == 'lng')
-    		return latlng[1];
+    function getCurrentLocation(latlng_type) {
+        var latlng = GetGetParameter("current_location").split(",");
+        if (latlng_type == 'lat')
+            return latlng[0];
+        else if (latlng_type == 'lng')
+            return latlng[1];
+        return null;
+    }
 
-    	return null;
-	}
+    function GetGetParameter(parameterName) {
+        var result = null, tmp = [];
+        location.search.substr(1).split("&").forEach(function (item) {
+            tmp = item.split("=");
+            if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
+        });
 
-	//map.html?current_location=25.257738,121.473656&event_location=25.357738,121.573656;25.757738,121.673656;25.257738,121.173656&event_name=停水,停電,修路&event_time=2017-06-15:09:30:00~2017-06-16:16:00:00,2017-06-15:09:30:00~2017-06-16:16:00:00,2017-06-15:09:30:00~2017-06-16:16:00:00
-	function GetGetParameter(parameterName) {
-    	var result = null, tmp = [];
-    	location.search.substr(1).split("&").forEach(function (item) {
-        	tmp = item.split("=");
-        	if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
-    	});
+        return result;
+    }
 
-    	return result;
-	}
-
-	function createMarker(latlng, label) {
+    function createMarker(latlng, label) {
         var event_label = label.split("<br>");
         var marker_visible = true;
         //console.log(event_label[0]);
@@ -245,24 +241,24 @@ $(function() {
 
         var contentString = '<b>'+label+'</b>';
 
-    	var marker = new google.maps.Marker({
-        	position: latlng,
-        	map: map,
-        	title: label,
+        var marker = new google.maps.Marker({
+            position: latlng,
+            map: map,
+            title: label,
             visible: marker_visible,
             icon: 'http://maps.google.com/mapfiles/ms/icons/'+color+'.png',
-        	zIndex: Math.round(latlng.lat()*-100000)<<5
+            zIndex: Math.round(latlng.lat()*-100000)<<5
         });
         
         marker.myname = "Event" + label;
 
-    	google.maps.event.addListener(marker, 'click', function() {
-        	infowindow.setContent(contentString);
-        	infowindow.open(map,marker);
+        google.maps.event.addListener(marker, 'click', function() {
+            infowindow.setContent(contentString);
+            infowindow.open(map,marker);
         });
 
-    	return marker;
-	}
+        return marker;
+    }
 
     //wgs87 <-> twd97 converter can be verified by this website online tool
     //ref:http://www.kmvs.km.edu.tw/lf/index.php?op=ViewArticle&articleId=349&blogId=70
@@ -361,9 +357,9 @@ $(function() {
         markerCluster.clearMarkers();
     }
     
-	// Initialize map on window load
+    // Initialize map on window load
     initialize();
-	// google.maps.event.addDomListener(window, 'load', initialize);
+    // google.maps.event.addDomListener(window, 'load', initialize);
 
     //set checkbox for marker group visible / invisible
     $('.VisibileCheckbox').change(function() {
